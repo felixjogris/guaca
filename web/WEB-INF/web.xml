@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <description>Redirector for Guacamole</description>
+    <display-name>guaca</display-name>
+    <servlet>
+        <servlet-name>dip</servlet-name>
+        <servlet-class>net.ogris.guaca.dip</servlet-class>
+        <init-param>
+            <param-name>redirection</param-name>
+            <param-value>/guacamole-0.8.3</param-value>
+        </init-param>
+        <init-param>
+            <param-name>configfile</param-name>
+            <param-value>/etc/guacamole/noauth-config.xml</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dip</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+</web-app>
