@@ -8,9 +8,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileLock;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,9 +35,8 @@ import org.xml.sax.SAXException;
 public class dip extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP
-     * <code>GET</code> and
-     * <code>POST</code> methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -152,20 +153,27 @@ public class dip extends HttpServlet {
             }
 
             if (connid == null) {
-                connid = "zzz" + UUID.randomUUID().toString();
+                //connid = "zzz" + UUID.randomUUID().toString();
                 Element config = xml.createElement("config");
                 docElem.appendChild(config);
 
-                config.setAttribute("name", connid);
+                connid = reqParams.get("hostname") + " (" + reqParams.get("protocol");
                 config.setAttribute("protocol", reqParams.get("protocol"));
                 reqParams.remove("protocol");
 
-                for (Map.Entry<String, String> entry : reqParams.entrySet()) {
+                for (Map.Entry<String, String> entry : new TreeMap<String, String>(reqParams).entrySet()) {
                     Element param = xml.createElement("param");
                     config.appendChild(param);
                     param.setAttribute("name", entry.getKey());
                     param.setAttribute("value", entry.getValue());
+                    
+                    if (!entry.getKey().equals("hostname")) {
+                        connid += "," + entry.getKey() + "=" + entry.getValue();
+                    }
                 }
+
+                connid += ")";
+                config.setAttribute("name", connid);
 
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -178,8 +186,12 @@ public class dip extends HttpServlet {
                 lock.release();
             }
 
+            connid += '\0' + "c" + '\0' + "noauth";
+            connid = Base64.getEncoder().encodeToString(connid.getBytes());
+
             response.addHeader("Set-Cookie", "JSESSIONID=; path=" + redirection);
-            response.sendRedirect(redirection + "/client.xhtml?id=c%2F" + connid);
+            response.addHeader("Set-Cookie", "GUAC_AUTH=; path=" + redirection);
+            response.sendRedirect(redirection + "/#/client/" + connid);
 
         } catch (TransformerConfigurationException e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -195,8 +207,7 @@ public class dip extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP
-     * <code>GET</code> method.
+     * Handles the HTTP <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -210,8 +221,7 @@ public class dip extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP
-     * <code>POST</code> method.
+     * Handles the HTTP <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
