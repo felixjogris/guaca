@@ -13,7 +13,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.UUID;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -96,8 +95,12 @@ public class dip extends HttpServlet {
                 reqParams.put("port", port);
             }
 
-            if ("vnc".equals(protocol) && !reqParams.containsKey("color-depth")) {
-                reqParams.put("color-depth", "24");
+            if ("vnc".equals(protocol)) {
+                reqParams.putIfAbsent("color-depth", "24");
+            }
+	    if ("rdp".equals(protocol)) {
+		    reqParams.putIfAbsent("security", "any");
+		    reqParams.putIfAbsent("ignore-cert", "true");
             }
 
             String connid = null;
