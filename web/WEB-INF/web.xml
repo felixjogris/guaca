@@ -11,7 +11,7 @@
         </init-param>
         <init-param>
             <param-name>configfile</param-name>
-            <param-value>/usr/local/etc/guacamole/noauth-config.xml</param-value>
+            <param-value>/usr/local/etc/guacamole-client/noauth-config.xml</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
