@@ -99,7 +99,7 @@ public class dip extends HttpServlet {
                 reqParams.putIfAbsent("color-depth", "24");
             }
 	    if ("rdp".equals(protocol)) {
-		    reqParams.putIfAbsent("security", "any");
+		    reqParams.putIfAbsent("security", "tls");
 		    reqParams.putIfAbsent("ignore-cert", "true");
             }
 
